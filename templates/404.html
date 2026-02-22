@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="text-center px-6">
+
+    <!-- 404 Number -->
+    <h1 class="text-9xl font-extrabold text-gray-800 tracking-widest">
+        404
+    </h1>
+
+    <!-- Divider -->
+    <div class="bg-indigo-500 px-2 text-sm rounded rotate-12 absolute">
+        Page Not Found
+    </div>
+
+    <!-- Message -->
+    <div class="mt-8">
+        <p class="text-lg text-gray-600 mb-6">
+            Sorry, the page you are looking for doesn't exist or has been moved.
+        </p>
+
+        <!-- Button -->
+        <a href="{% url 'home' %}"
+            class="inline-block px-6 py-3 bg-indigo-600 text-black font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">
+            Go Back Home
+        </a>
+    </div>
+
+</div>
+{% endblock %}

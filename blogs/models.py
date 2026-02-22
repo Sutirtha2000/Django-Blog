@@ -25,7 +25,7 @@ class Category(models.Model):
 class Blog(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(max_length=150, unique=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=False, blank=False, related_name='categories')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=False, blank=False, related_name='blogs')
     image = models.ImageField(upload_to='uploads/%Y/%m/%d')
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
