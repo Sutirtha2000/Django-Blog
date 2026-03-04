@@ -10,7 +10,8 @@
     <div class="col-md-8 px-0">
         <h1 class="display-4 font-italic">{{ post.title }}</h1>
         <p class="lead my-3">{{ post.content | truncatewords:25 }}</p>
-        <p class="lead mb-0"><a href="" class="text-white font-weight-bold">Continue reading...</a></p>
+        <p class="lead mb-0"><a href="{% url 'blog_view' slug=post.slug %}" class="text-white font-weight-bold">Continue
+                reading...</a></p>
     </div>
 </div>
 {% endif %}
@@ -25,7 +26,7 @@
     <div class="col-md-6">
         <div class="card border-0">
             <div class="card-body">
-                <h3><a href="" class="text-dark">{{ post.title }}</a></h3>
+                <h3><a href="{% url 'blog_view' slug=post.slug %}" class="text-dark">{{ post.title }}</a></h3>
                 <small class="mb-1 text-muted">{{ post.created_at | timesince }} ago | {{ post.author }}</small>
                 <p class="card-text">{{ post.content | truncatewords:25 }}</p>
             </div>
@@ -44,7 +45,7 @@
             {% for post in posts %}
             <div class="card border-0">
                 <div class="card-body">
-                    <h3> <a href="" class="text-dark">{{ post.title }}</a></h3>
+                    <h3> <a href="{% url 'blog_view' slug=post.slug %}" class="text-dark">{{ post.title }}</a></h3>
                     <small class="mb-1 text-muted">{{ post.created_at | timesince }} ago | {{ post.author }}</small>
                     <p class="card-text">{{ post.content | truncatewords:25 }}</p>
                 </div>
@@ -55,8 +56,8 @@
 
         <aside class="col-md-4 blog-sidebar">
             <div class="p-3 mb-3 bg-light rounded">
-                <h4 class="font-italic">{{ about.about_heading }}</h4>
-                <p class="mb-0">{{ about.about_description }}</p>
+                <h4 class="font-italic">{{ about.header }}</h4>
+                <p class="mb-0">{{ about.description }}</p>
             </div>
 
             {% if social_links %}
