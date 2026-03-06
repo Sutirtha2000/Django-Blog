@@ -36,11 +36,14 @@
                     {% if user.is_authenticated %}
                     <span><a class="btn btn-sm btn-warning" href="">Dashboard</a></span>
                     &emsp;
-
-                    <span><a class="btn btn-sm btn-danger" href="">Logout</a></span>
+                    <!-- <span><a class="btn btn-sm btn-danger" href="{% url 'logout' %}">Logout</a></span> -->
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Logout</button>
+                    </form>
                     {% else %}
-                    <a class="btn btn-sm btn-warning" href="">Login</a> &nbsp;
-                    <a class="btn btn-sm btn-outline-secondary" href="">Register</a>
+                    <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;
+                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'register' %}">Register</a>
                     {% endif %}
 
                 </div>
