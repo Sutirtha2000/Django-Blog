@@ -11,14 +11,18 @@ class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('home')
+        
+        next_url = request.GET.get('next')
 
         context = {
-            'form' : LoginForm()
+            'form' : LoginForm(),
+            'next' : next_url
         }
         return render(request, 'core/login.html',context=context)
     
     def post(self, request):
         form = LoginForm(request, request.POST)
+        next_url = request.POST.get('next')
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
@@ -28,8 +32,8 @@ class LoginView(View):
             if user is not None:
                 login(request, user=user)
                 messages.success(request, "You are logged in successfully!")
-                next_url = request.GET.get('next', 'home')
-                return redirect(next_url)
+                # next_url = request.GET.get('next', 'home')
+                return redirect(next_url or 'home')
             else:
                 messages.error(request, "Invalid username or password")
         else:
@@ -63,7 +67,8 @@ class RegisterView(View):
 
 class LogoutView(View):
     def post(self, request):
+        next_url = request.POST.get('next', 'home')
         logout(request)
         messages.success(request, "You are Logged out Successfully !!!")
-        next_url = request.GET.get('next', 'home')
+        # next_url = request.GET.get('next', 'home')
         return redirect(next_url)

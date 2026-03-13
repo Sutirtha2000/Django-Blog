@@ -20,7 +20,7 @@ def home(request):
         'posts' : posts,
         'about' : about
     }
-    return render(request, 'home.html', context=context)
+    return render(request, 'blogs/home.html', context=context)
 
 class CategoryView(View):
     def get(self, request, pk=None):
@@ -61,4 +61,4 @@ class Search(View):
             'blogs' : blogs,
             'q' : q
         }
-        return render(request, 'search.html', context=context)
+        return render(request, 'blogs/search.html', context=context)
