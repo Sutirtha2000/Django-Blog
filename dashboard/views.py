@@ -3,8 +3,10 @@ from django.http import Http404
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.template.defaultfilters import slugify
+
 from blogs.models import Blog, Category
-from blogs.forms import CategoryForm
+from blogs.forms import CategoryForm, BlogForm
 # Create your views here.
 
 class DashboardView(LoginRequiredMixin, View):
@@ -89,7 +91,7 @@ class EditCategoryView(LoginRequiredMixin, View):
         return render(request, 'dashboard/add_category.html', context=context)
 
 
-class DeleteViewClass(LoginRequiredMixin, View):
+class DeleteCategoryView(LoginRequiredMixin, View):
     def get_category(self, pk=None):
         try:
             category = Category.objects.get(pk=pk)
@@ -107,3 +109,110 @@ class DeleteViewClass(LoginRequiredMixin, View):
         category.delete()
         messages.success(request, "Category deleted Successfully !!!")
         return redirect('categories')
+
+
+class AllBlogsView(LoginRequiredMixin, View):
+    def get(self, request):
+        blogs = Blog.objects.all()
+        context = {
+            'blogs' : blogs
+        }
+        return render(request, 'dashboard/blogs.html', context=context)
+
+
+class AddBlogView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = BlogForm()
+        context = {
+            'form' : form,
+        }
+        return render(request, 'dashboard/add_blog.html', context=context)
+    
+    def post(self, request):
+        form = BlogForm(request.POST, request.FILES)
+        if form.is_valid():
+            blog = form.save(commit=False)
+            blog.author = request.user
+            blog.save()
+            title = form.cleaned_data.get('title')
+            blog.slug = slugify(title) + "-" + str(blog.id)
+            # print(blog)
+            blog.save()
+            return redirect('blogs')
+        context = {
+            'form' : form
+        }
+        return render(request, 'dashboard/add_blog.html', context=context)
+    
+
+class EditBlogView(LoginRequiredMixin, View):
+    def get_blog(self, slug=None):
+        try:
+            blog = Blog.objects.get(slug=slug)
+            return blog
+        except Blog.DoesNotExist:
+            return None
+
+    def get(self, request, slug=None):
+        blog = self.get_blog(slug=slug)
+
+        if blog is None:
+            messages.info(request, "This Blog does not exist !!!")
+            return redirect('blogs')
+        
+        if blog.author != request.user:
+            messages.error(request, "You are not allowed to edit this blog.")
+            return redirect('blogs')
+        
+        form = BlogForm(instance=blog)
+        context = {
+            'form' : form,
+            'edit' : True
+        }
+        return render(request, 'dashboard/add_blog.html', context=context)
+
+    def post(self, request, slug=None):
+        blog = self.get_blog(slug=slug)
+
+        if blog is None:
+            messages.info(request, "This Blog does not exist !!!")
+            return redirect('blogs')
+        
+        if blog.author != request.user:
+            messages.error(request, "You are not allowed to edit this blog.")
+            return redirect('blogs')
+
+        form = BlogForm(request.POST, request.FILES, instance=blog)
+        if form.is_valid():
+            blog = form.save()
+            title = form.cleaned_data.get('title')
+            new_slug = slugify(title) + "-" + str(blog.id)
+            if new_slug != blog.slug:
+                blog.slug = new_slug
+            blog.save()
+            return redirect('blogs')
+        context = {
+            'form' : form,
+            'edit' : True
+        }
+        return render(request, 'dashboard/add_blog.html', context=context)
+
+
+class DeleteBlogView(LoginRequiredMixin, View):
+    def get_blog(self, slug=None):
+        try:
+            blog = Blog.objects.get(slug=slug)
+            return blog
+        except Blog.DoesNotExist:
+            return None
+        
+    def get(self, request, slug=None):
+        blog = self.get_blog(slug=slug)
+
+        if blog is None:
+            messages.info(request, "This Blog does not exist !!!")
+            return redirect('blogs')
+        
+        blog.delete()
+        messages.success(request, "Blog deleted Successfully !!!")
+        return redirect('blogs')

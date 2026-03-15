@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <!-- Left sidebar -->
+    <!-- load the sidebar here -->
+
+    {% include 'includes/sidebar.html' %}
+    <!-- Right side content -->
+    <div class="col-md-9">
+        <h2>All Blogs</h2>
+        <a href="{% url 'add_blog' %}" class="btn btn-dark text-light float-right mb-2">Add New</a>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Sl. No</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Author</th>
+                    <th>Status</th>
+                    <th>Featured</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for blog in blogs %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ blog.title }}</td>
+                    <td>{{ blog.category }}</td>
+                    <td>{{ blog.author }}</td>
+                    <td>{{ blog.status }}</td>
+                    <td>{% if blog.is_featured %}<i class="fa fa-check text-success"></i>{% else %}<i
+                            class="fa fa-times text-danger"></i>{% endif %}</td>
+                    <td>
+                        <a href="{% url 'edit_blog' slug=blog.slug %}"><i class="fa fa-edit text-success"></i></a>
+                        &nbsp;
+                        <a href="{% url 'delete_blog' slug=blog.slug %}"><i class="fa fa-trash text-danger"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
