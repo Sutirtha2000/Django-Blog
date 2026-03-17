@@ -4,9 +4,11 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.template.defaultfilters import slugify
+from django.contrib.auth.models import User
 
 from blogs.models import Blog, Category
 from blogs.forms import CategoryForm, BlogForm
+from core.forms import AddUserForm, EditUserForm
 # Create your views here.
 
 class DashboardView(LoginRequiredMixin, View):
@@ -216,3 +218,94 @@ class DeleteBlogView(LoginRequiredMixin, View):
         blog.delete()
         messages.success(request, "Blog deleted Successfully !!!")
         return redirect('blogs')
+
+
+class AllUsersView(LoginRequiredMixin, View):
+    def get(self, request):
+        users = User.objects.all()
+        context = {
+            'users' : users
+        }
+        return render(request, 'dashboard/users.html', context=context)
+
+
+class AddUserView(LoginRequiredMixin, View):
+    def get(self, request):
+        form = AddUserForm()
+        context = {
+            'form' : form
+        }
+        return render(request, 'dashboard/add_user.html', context=context)
+    
+    def post(self, request):
+        form = AddUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "User registered Successfully !!!")
+            return redirect('users')
+        context = {
+            'form' : form
+        }
+        return render(request, 'dashboard/add_user.html', context=context)
+
+
+class EditUserView(LoginRequiredMixin, View):
+    def get_user(self, pk=None):
+        try:
+            user = User.objects.get(pk=pk)
+            return user
+        except User.DoesNotExist:
+            return None
+
+    def get(self, request, pk=None):
+        user = self.get_user(pk=pk)
+
+        if user is None:
+            messages.info(request, "This User does not exist !!!")
+            return redirect('users')
+        
+        form = EditUserForm(instance=user)
+        context = {
+            'form' : form,
+            'edit' : True
+        }
+        return render(request, 'dashboard/add_user.html', context=context)
+    
+    def post(self, request, pk=None):
+        user = self.get_user(pk=pk)
+
+        if user is None:
+            messages.info(request, "This User does not exist !!!")
+            return redirect('users')
+        
+        form = EditUserForm(request.POST, instance=user)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Details Updated Successfully !!!")
+            return redirect('users')
+        context = {
+            'form' : form,
+            'edit' : True
+        }
+        return render(request, 'dashboard/add_user.html', context=context)
+
+
+class DeleteUserView(LoginRequiredMixin, View):
+    def get_user(self, pk=None):
+        try:
+            user = User.objects.get(pk=pk)
+            return user
+        except User.DoesNotExist:
+            return None
+        
+    def get(self, request, pk=None):
+        user = self.get_user(pk=pk)
+
+        if user is None:
+            messages.info(request, "This User does not exist !!!")
+            return redirect('users')
+        
+        user.delete()
+        messages.success(request, "User deleted Successfully !!!")
+        return redirect('users')

@@ -15,4 +15,10 @@ urlpatterns = [
     path('blogs/create/', views.AddBlogView.as_view(), name='add_blog'),
     path('blogs/edit/<slug:slug>/', views.EditBlogView.as_view(), name='edit_blog'),
     path('blogs/delete/<slug:slug>/',views.DeleteBlogView.as_view(), name='delete_blog'),
+
+    # Users App
+    path('users/', views.AllUsersView.as_view(), name='users'),
+    path('users/create/', views.AddUserView.as_view(), name='add_user'),
+    path('users/edit/<int:pk>/', views.EditUserView.as_view(), name='edit_user'),
+    path('users/delete/<int:pk>/', views.DeleteUserView.as_view(), name='delete_user'),
 ]

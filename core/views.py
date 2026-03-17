@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .forms import RegistrationForm, LoginForm
 # Create your views here.
@@ -33,11 +34,21 @@ class LoginView(View):
                 login(request, user=user)
                 messages.success(request, "You are logged in successfully!")
                 # next_url = request.GET.get('next', 'home')
-                return redirect(next_url or 'home')
+                if next_url and next_url != "None" and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                    # print(next_url)
+                    return redirect(next_url)
+                # if next_url == "None":
+                #     print(next_url)
+                #     return redirect('home')
+                return redirect('home')
             else:
                 messages.error(request, "Invalid username or password")
         else:
-            return render(request, 'core/login.html', {'form': form})
+            context = {
+                'form' : form,
+                'next' : next_url
+            }
+            return render(request, 'core/login.html', context=context)
 
 
 class RegisterView(View):
@@ -68,6 +79,7 @@ class RegisterView(View):
 class LogoutView(View):
     def post(self, request):
         next_url = request.POST.get('next', 'home')
+        # print(next_url)
         logout(request)
         messages.success(request, "You are Logged out Successfully !!!")
         # next_url = request.GET.get('next', 'home')
