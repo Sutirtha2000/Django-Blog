@@ -3,8 +3,10 @@ from django.views import View
 from django.contrib import messages
 from django.http import Http404
 from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Category, Blog
+from .models import Category, Blog, Comment
 from assignments.models import About
 # Create your views here.
 def home(request):
@@ -22,7 +24,7 @@ def home(request):
     }
     return render(request, 'blogs/home.html', context=context)
 
-class CategoryView(View):
+class CategoryView(LoginRequiredMixin, View):
     def get(self, request, pk=None):
         try:
             category = Category.objects.get(pk=pk)
@@ -39,18 +41,47 @@ class CategoryView(View):
 
 
 class BlogViewClass(View):
-    def get(self, request, slug=None):
+    def get_blog(self, slug=None):
         try:
             blog = Blog.objects.get(slug=slug)
+            return blog
         except Blog.DoesNotExist:
+            return None
+        
+    def get(self, request, slug=None):
+        
+        blog = self.get_blog(slug=slug)
+
+        if blog is None:
             messages.info(request, "This Blog does not exist !!!")
             return redirect('home')
         
+        comments = Comment.objects.filter(blog=blog)
+        count = comments.count()
+
         context = {
-            'blog' : blog
+            'blog' : blog,
+            'comments' : comments,
+            'comment_count' : count,
         }
 
         return render(request, 'blogs/blog.html', context=context)
+    
+    def post(self, request, slug=None):
+        blog = self.get_blog(slug=slug)
+
+        if blog is None:
+            messages.info(request, "This Blog does not exist !!!")
+            return redirect('blogs')
+        
+        comment = Comment()
+        content = request.POST.get('comment')
+        comment.content = content
+        comment.blog = blog
+        comment.user = request.user
+        comment.save()
+        return HttpResponseRedirect(request.path_info)
+
 
 class Search(View):
     def get(self, request):

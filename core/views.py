@@ -13,10 +13,12 @@ class LoginView(View):
         if request.user.is_authenticated:
             return redirect('home')
         
+        form = LoginForm()
         next_url = request.GET.get('next')
+        print(next_url)
 
         context = {
-            'form' : LoginForm(),
+            'form' : form,
             'next' : next_url
         }
         return render(request, 'core/login.html',context=context)
@@ -24,6 +26,7 @@ class LoginView(View):
     def post(self, request):
         form = LoginForm(request, request.POST)
         next_url = request.POST.get('next')
+        print(next_url)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
@@ -78,9 +81,11 @@ class RegisterView(View):
 
 class LogoutView(View):
     def post(self, request):
-        next_url = request.POST.get('next', 'home')
+        next_url = request.POST.get('next')
         # print(next_url)
         logout(request)
         messages.success(request, "You are Logged out Successfully !!!")
         # next_url = request.GET.get('next', 'home')
-        return redirect(next_url)
+        if next_url:
+            return redirect(next_url)
+        return redirect('home')

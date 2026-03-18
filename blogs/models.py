@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 
 # Create your models here.
 STATUS_CHOICE = (
@@ -40,3 +41,14 @@ class Blog(models.Model):
     class Meta:
         verbose_name = 'blog'
         verbose_name_plural = 'blogs'
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=False, related_name='comments')
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, blank=False, null=False, related_name='comments')
+    content = models.TextField(validators=[MinLengthValidator(5), MaxLengthValidator(300)])
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.content

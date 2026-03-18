@@ -4,7 +4,7 @@
 
 {% block content %}
 <h3 class="text-center">Login</h3>
-<form action="{% url 'login' %}" method="post" style="width:500px; margin:auto;">
+<form action="." method="post" style="width:500px; margin:auto;">
     {% csrf_token %}
     {{form | crispy}}
     <input type="hidden" name="next" value="{{ next }}">
